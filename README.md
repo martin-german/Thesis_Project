@@ -1,5 +1,7 @@
 # MindSpace – Mental Health Web Application
 
+---
+
 ## Created With
 - React JSX (minimal TSX) + Tailwind CSS  
 - Node.js + Express  
@@ -35,6 +37,11 @@ Built with care, curiosity, and a deep commitment to mental wellness.
 - Dotenv
 
 ---
+
+## Link to Demo Version 1.0 - No backend & database. <br> 
+The Youtube link contains a presentation about the whole project.
+- https://thesisprojectdemo.onrender.com/ 
+- https://www.youtube.com/watch?v=2HhrEH49_Cc
 
 ## Project Overview
 **MindSpace** is a modern mental health platform designed to help users reduce stress, reflect meaningfully, and grow personally. Originally built for students aged 12–25, it now welcomes anyone seeking clarity, calm, and emotional resilience.
@@ -100,10 +107,17 @@ What began as a student-focused wellness tool has evolved into a broader platfor
 
 ---
 
+## Install - Project made as a monorepo (backend/frontend uses the same package.json)
+- git clone
+- npm i or npm install
+- npm run dev
+---
+## Warning
+You need your own .env file or replace .env meta link with your API key, and create API keys for Google, Gemini , EmailJS and more.
+
 ## License & Credits
 This project was developed in 2025 as part of a thesis at the **University of Szeged**. It is intended for educational and personal development use.
 
 All assets used in this application are either original creations or sourced from open platforms with proper attribution. Commercial use is not permitted without explicit permission from the author.
 
 ---
-
