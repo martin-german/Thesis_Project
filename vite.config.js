@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   root: 'frontend',
-  base: '/', // if GithubPages: '/thesis-project/'
+  base: '/',
   plugins: [react()],
   resolve: {
     alias: {
@@ -12,4 +12,3 @@ export default defineConfig({
     }
   },
 });
-

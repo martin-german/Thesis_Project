@@ -103,12 +103,12 @@ export const googleLogin = async (req, res) => {
           null, // password
           "user",
           true, // isVerified
-          null, // birthday
+           // birthday
           currentDate,
         ];
 
         db.query(
-          "INSERT INTO users (name, email, username, password, role, isVerified, birthday, memberSince) VALUES (?)",
+          "INSERT INTO users (name, email, username, password, role, isVerified, memberSince) VALUES (?)",
           [newUser],
           (insertErr, result) => {
             if (insertErr) {

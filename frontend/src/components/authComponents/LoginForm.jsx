@@ -64,7 +64,7 @@ function LoginForm({
       <div className="flex justify-center mt-4">
         <button
           type="submit"
-          className="bg-carolina hover:bg-gleccser text-black border-2 border-black px-4 py-2 rounded-lg transition duration-300"
+          className="px-4 py-2 text-sm rounded-md font-bold transition duration-300 shadow-sm hover:shadow-lg bg-teal-600 hover:bg-teal-700 text-white"
           disabled={successMessage}
         >
           Login

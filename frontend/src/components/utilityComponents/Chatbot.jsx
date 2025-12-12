@@ -17,35 +17,60 @@ const Chatbot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+  const allowedKeywords = [
+    "mental", "mentális", "egészség", "health", "wellness", "jólét",
+    "stressz", "stress", "szorongás", "anxiety", "depresszió", "depression",
+    "terápia", "therapy", "tanácsadás", "counseling", "segítség", "help",
+    "meditáció", "meditation", "relaxáció", "relaxation",
+    "pszichológia", "psychology", "önismeret", "self-care", "selfcare",
+    "henia", "chatbot", "oldal", "website", "platform", "app",
+    "regisztráció", "registration", "bejelentkezés", "login", "sign",
+    "szolgáltatás", "service", "árak", "prices", "pricing", "ár",
+    "support", "care", "mindfulness", "emotional", "feeling",
+    "assist", "information", "about", "info",
+    "fiók", "account", "profil", "profile",
+    "előfizetés", "subscription", "member", "tag",
+    "kapcsolat", "contact", "elérhetőség", "reach",
+
+    ...prompts.map(p => p.text.toLowerCase().split(" ")).flat()
+  ];
+
   const predefinedPromptsSELECT = prompts.map((prompt) => {
-  if (typeof prompt.response === "string" && prompt.response.startsWith("linktext:")) {
-    const [path, text] = prompt.response
-      .replace("linktext:", "")
-      .split("::");
-    return {
-      ...prompt,
-      response: (
-        <Link to={path.trim()} className="text-blue-500 underline">
-          {text.trim()}
-        </Link>
-      ),
-    };
-  } else if (prompt.response.startsWith("link:")) {
-    const path = prompt.response.replace("link:", "");
-    return {
-      ...prompt,
-      response: (
-        <Link to={path} className="text-blue-500 underline">
-          {prompt.text}
-        </Link>
-      ),
-    };
-  }
-  return prompt;
-});
+    if (typeof prompt.response === "string" && prompt.response.startsWith("linktext:")) {
+      const [path, text] = prompt.response
+        .replace("linktext:", "")
+        .split("::");
+      return {
+        ...prompt,
+        response: (
+          <Link to={path.trim()} className="text-blue-500 underline">
+            {text.trim()}
+          </Link>
+        ),
+      };
+    } else if (prompt.response.startsWith("link:")) {
+      const path = prompt.response.replace("link:", "");
+      return {
+        ...prompt,
+        response: (
+          <Link to={path} className="text-blue-500 underline">
+            {prompt.text}
+          </Link>
+        ),
+      };
+    }
+    return prompt;
+  });
 
   const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI);
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+  const containsRelevantKeyword = (text) => {
+    const normalizedText = text.toLowerCase();
+    return allowedKeywords.some(keyword =>
+      normalizedText.includes(keyword.toLowerCase())
+    );
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -77,8 +102,52 @@ const Chatbot = () => {
       return;
     }
 
+    if (!containsRelevantKeyword(userInput)) {
+      const rejectionMessage = `Sajnálom, de csak az oldallal és a mentális egészséggel kapcsolatos kérdésekre tudok válaszolni. 🌿
+
+Például segíthetek:
+- Az oldal szolgáltatásairól
+- Mentális egészség témákban
+- Regisztrációval és bejelentkezéssel
+- Árakkal és előfizetésekkel
+
+Kérlek, válassz az alábbi témák közül! 😊
+
+---
+
+Sorry, but I can only answer questions related to our website and mental health. 🌿
+
+For example, I can help with:
+- Website services
+- Mental health topics
+- Registration and login
+- Pricing and subscriptions
+
+Please choose from the topics below! 😊`;
+
+      setChatHistory((prev) => [
+        ...prev,
+        { type: "user", message: userInput },
+        { type: "bot", message: rejectionMessage },
+      ]);
+      setUserInput("");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const result = await model.generateContent(userInput);
+      const systemPrompt = `Te Henia vagy, egy mentális egészség támogató platform virtuális asszisztense.
+      Csak az alábbi témákban válaszolj:
+      - Mentális egészség és wellness
+      - Az oldal szolgáltatásai
+      - Regisztráció, bejelentkezés
+      - Árak és előfizetések
+      - Terápia és tanácsadás
+
+      Ha a kérdés nem ezekhez kapcsolódik, udvariasan utasítsd el és irányítsd a releváns témákra.
+      Válaszolj röviden, barátságosan és támogatóan. Használj emojikat mértékkel.`;
+
+      const result = await model.generateContent(`${systemPrompt}\n\nFelhasználó kérdése: ${userInput}`);
       const response = await result.response;
       setChatHistory((prev) => [
         ...prev,
@@ -87,6 +156,11 @@ const Chatbot = () => {
       ]);
     } catch (error) {
       console.error("Error sending message:", error);
+      setChatHistory((prev) => [
+        ...prev,
+        { type: "user", message: userInput },
+        { type: "bot", message: "Sajnálom, hiba történt. Kérlek, próbáld újra! 😊" },
+      ]);
     } finally {
       setUserInput("");
       setIsLoading(false);
